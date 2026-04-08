@@ -28,7 +28,16 @@ const resources = {
       "wallet_address": "Wallet Address",
       "i_have_paid": "I Have Paid",
       "home_title": "DarkBlaiseX Login",
-      "settings": "Settings"
+      "settings": "Settings",
+      "dont_have_account": "Don't have an account? Register",
+      "already_have_account": "Already have an account? Login",
+      "profile_updated": "Profile updated successfully",
+      "error_updating_profile": "Error updating profile",
+      "new_password": "New Password",
+      "leave_blank_password": "Leave blank to keep current",
+      "save_changes": "Save Changes",
+      "vip_member": "VIP MEMBER",
+      "rookie_member": "ROOKIE MEMBER"
     }
   },
   it: {
@@ -168,7 +177,16 @@ const resources = {
       "wallet_address": "Cüzdan Adresi",
       "i_have_paid": "Ödeme Yaptım",
       "home_title": "DarkBlaiseX Giriş",
-      "settings": "Ayarlar"
+      "settings": "Ayarlar",
+      "dont_have_account": "Hesabınız yok mu? Kayıt Ol",
+      "already_have_account": "Zaten hesabınız var mı? Giriş Yap",
+      "profile_updated": "Profil başarıyla güncellendi",
+      "error_updating_profile": "Profil güncellenirken hata oluştu",
+      "new_password": "Yeni Şifre",
+      "leave_blank_password": "Mevcut şifreyi korumak için boş bırakın",
+      "save_changes": "Değişiklikleri Kaydet",
+      "vip_member": "VİP ÜYE",
+      "rookie_member": "ÇAYLAK ÜYE"
     }
   }
 };

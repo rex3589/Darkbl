@@ -3,10 +3,12 @@ import { auth, db } from '../firebase';
 import { updatePassword, updateProfile } from 'firebase/auth';
 import { doc, updateDoc } from 'firebase/firestore';
 import { motion } from 'motion/react';
+import { useTranslation } from 'react-i18next';
 import { UserProfile } from '../types';
 import { User, Mail, Shield, ShieldCheck, ShieldAlert, Lock, Save, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
 
 export default function ProfilePage({ userProfile }: { userProfile: UserProfile | null }) {
+  const { t } = useTranslation();
   const [displayName, setDisplayName] = useState(userProfile?.displayName || '');
   const [newPassword, setNewPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -28,10 +30,10 @@ export default function ProfilePage({ userProfile }: { userProfile: UserProfile 
         await updatePassword(auth.currentUser, newPassword);
       }
 
-      setMessage({ type: 'success', text: 'Profile updated successfully' });
+      setMessage({ type: 'success', text: t('profile_updated') });
       setNewPassword('');
     } catch (err: any) {
-      setMessage({ type: 'error', text: err.message || 'Error updating profile' });
+      setMessage({ type: 'error', text: err.message || t('error_updating_profile') });
     } finally {
       setLoading(false);
     }
@@ -70,7 +72,7 @@ export default function ProfilePage({ userProfile }: { userProfile: UserProfile 
                 ? "bg-cyan-500/10 border-cyan-500 text-cyan-400 shadow-lg shadow-cyan-500/10" 
                 : "bg-yellow-500/10 border-yellow-500 text-yellow-500"
             )}>
-              {userProfile?.isVip ? 'VİP ÜYE' : 'ÇAYLAK ÜYE'}
+              {userProfile?.isVip ? t('vip_member') : t('rookie_member')}
             </div>
           </div>
         </div>
@@ -88,7 +90,7 @@ export default function ProfilePage({ userProfile }: { userProfile: UserProfile 
         <form onSubmit={handleUpdateProfile} className="space-y-6">
           <div className="grid md:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <label className="text-gray-500 text-[10px] uppercase tracking-[0.2em] font-black ml-1">Display Name</label>
+              <label className="text-gray-500 text-[10px] uppercase tracking-[0.2em] font-black ml-1">{t('display_name')}</label>
               <div className="relative">
                 <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
                 <input
@@ -100,12 +102,12 @@ export default function ProfilePage({ userProfile }: { userProfile: UserProfile 
               </div>
             </div>
             <div className="space-y-2">
-              <label className="text-gray-500 text-[10px] uppercase tracking-[0.2em] font-black ml-1">New Password</label>
+              <label className="text-gray-500 text-[10px] uppercase tracking-[0.2em] font-black ml-1">{t('new_password')}</label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
                 <input
                   type="password"
-                  placeholder="Leave blank to keep current"
+                  placeholder={t('leave_blank_password')}
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   className="w-full bg-black/50 border border-zinc-800 rounded-xl py-4 pl-11 pr-4 text-white focus:outline-none focus:border-cyan-500 transition-colors"
@@ -120,7 +122,7 @@ export default function ProfilePage({ userProfile }: { userProfile: UserProfile 
             className="w-full bg-cyan-500 hover:bg-cyan-400 disabled:opacity-50 text-black font-black uppercase tracking-widest py-5 rounded-xl transition-all shadow-xl shadow-cyan-500/20 flex items-center justify-center gap-3"
           >
             {loading ? <Loader2 className="w-6 h-6 animate-spin" /> : <Save className="w-6 h-6" />}
-            Save Changes
+            {t('save_changes')}
           </button>
         </form>
       </motion.div>

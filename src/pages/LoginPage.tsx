@@ -161,7 +161,7 @@ export default function LoginPage() {
             onClick={() => setIsLogin(!isLogin)}
             className="text-gray-500 hover:text-cyan-400 text-sm transition-colors"
           >
-            {isLogin ? "Don't have an account? Register" : "Already have an account? Login"}
+            {isLogin ? t('dont_have_account') : t('already_have_account')}
           </button>
         </div>
       </motion.div>
