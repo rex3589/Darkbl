@@ -1,0 +1,114 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    // Collection: users
+    // Document ID: userId (UID)
+    // Fields:
+    //   - uid: string (required)
+    //   - email: string (required)
+    //   - role: string (required, 'admin' or 'user')
+    //   - isVip: boolean (optional)
+    //   - vipExpiry: string (optional, ISO 8601)
+    //   - displayName: string (optional)
+    //
+    // Collection: payments
+    // Document ID: paymentId (auto-generated)
+    // Fields:
+    //   - uid: string (required)
+    //   - amount: number (required)
+    //   - plan: string (required, '1_DAY' or '30_DAY')
+    //   - status: string (required, 'pending', 'completed', 'failed')
+    //   - cryptoType: string (required, 'BTC', 'ETH', 'LTC', 'USDT')
+    //   - address: string (required)
+    //   - createdAt: string (required, ISO 8601)
+    //
+    // Collection: messages
+    // Document ID: messageId (auto-generated)
+    // Fields:
+    //   - senderUid: string (required)
+    //   - receiverUid: string (required)
+    //   - content: string (required)
+    //   - createdAt: string (required, ISO 8601)
+    //   - read: boolean (optional)
+    //
+    // Collection: settings
+    // Document ID: global
+    // Fields:
+    //   - btcAddress: string
+    //   - ethAddress: string
+    //   - ltcAddress: string
+    //   - usdtAddress: string
+    //   - vip1DayPrice: number
+    //   - vip30DayPrice: number
+    // ===============================================================
+
+    // Helper Functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() &&
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
+         request.auth.token.email == "akrexsoft@gmail.com");
+    }
+
+    function isValidUser(data) {
+      return data.keys().hasAll(['uid', 'email', 'role']) &&
+             data.uid is string &&
+             data.email is string &&
+             data.role in ['admin', 'user'];
+    }
+
+    function isValidPayment(data) {
+      return data.keys().hasAll(['uid', 'amount', 'plan', 'status', 'cryptoType', 'address', 'createdAt']) &&
+             data.uid is string &&
+             data.amount is number &&
+             data.plan in ['1_DAY', '30_DAY'] &&
+             data.status in ['pending', 'completed', 'failed'] &&
+             data.cryptoType in ['BTC', 'ETH', 'LTC', 'USDT'] &&
+             data.address is string &&
+             data.createdAt is string;
+    }
+
+    function isValidMessage(data) {
+      return data.keys().hasAll(['senderUid', 'receiverUid', 'content', 'createdAt']) &&
+             data.senderUid is string &&
+             data.receiverUid is string &&
+             data.content is string &&
+             data.content.size() < 1000 &&
+             data.createdAt is string;
+    }
+
+    // Rules
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && isOwner(userId) && isValidUser(request.resource.data) && request.resource.data.role == 'user';
+      allow update: if isAdmin() || (isOwner(userId) && request.resource.data.role == resource.data.role);
+    }
+
+    match /payments/{paymentId} {
+      allow read: if isAdmin() || (isAuthenticated() && resource.data.uid == request.auth.uid);
+      allow create: if isAuthenticated() && request.resource.data.uid == request.auth.uid && isValidPayment(request.resource.data);
+      allow update: if isAdmin();
+    }
+
+    match /messages/{messageId} {
+      allow read: if isAdmin() || (isAuthenticated() && (resource.data.senderUid == request.auth.uid || resource.data.receiverUid == request.auth.uid));
+      allow create: if isAuthenticated() && request.resource.data.senderUid == request.auth.uid && isValidMessage(request.resource.data);
+      allow update: if isAdmin() || (isAuthenticated() && resource.data.receiverUid == request.auth.uid && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read']));
+    }
+
+    match /settings/global {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+  }
+}

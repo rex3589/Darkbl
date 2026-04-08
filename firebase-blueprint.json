@@ -1,0 +1,77 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile and subscription status",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string" },
+        "role": { "type": "string", "enum": ["admin", "user"] },
+        "isVip": { "type": "boolean" },
+        "vipExpiry": { "type": "string", "format": "date-time" },
+        "displayName": { "type": "string" }
+      },
+      "required": ["uid", "email", "role"]
+    },
+    "Payment": {
+      "title": "Payment",
+      "description": "Cryptocurrency payment record",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "amount": { "type": "number" },
+        "plan": { "type": "string", "enum": ["1_DAY", "30_DAY"] },
+        "status": { "type": "string", "enum": ["pending", "completed", "failed"] },
+        "cryptoType": { "type": "string", "enum": ["BTC", "ETH", "LTC", "USDT"] },
+        "address": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "amount", "plan", "status", "cryptoType", "address", "createdAt"]
+    },
+    "Message": {
+      "title": "Message",
+      "description": "Direct message between user and admin",
+      "type": "object",
+      "properties": {
+        "senderUid": { "type": "string" },
+        "receiverUid": { "type": "string" },
+        "content": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "read": { "type": "boolean" }
+      },
+      "required": ["senderUid", "receiverUid", "content", "createdAt"]
+    },
+    "Settings": {
+      "title": "Settings",
+      "description": "Global application settings managed by admin",
+      "type": "object",
+      "properties": {
+        "btcAddress": { "type": "string" },
+        "ethAddress": { "type": "string" },
+        "ltcAddress": { "type": "string" },
+        "usdtAddress": { "type": "string" },
+        "vip1DayPrice": { "type": "number" },
+        "vip30DayPrice": { "type": "number" }
+      }
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profiles"
+    },
+    "/payments/{paymentId}": {
+      "schema": "Payment",
+      "description": "Payment records"
+    },
+    "/messages/{messageId}": {
+      "schema": "Message",
+      "description": "User-Admin messages"
+    },
+    "/settings/global": {
+      "schema": "Settings",
+      "description": "Global settings"
+    }
+  }
+}
