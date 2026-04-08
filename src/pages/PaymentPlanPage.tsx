@@ -3,11 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { db } from '../firebase';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { motion } from 'motion/react';
+import { useTranslation } from 'react-i18next';
 import { UserProfile, GlobalSettings } from '../types';
 import { Shield, Check, ArrowRight, Zap, Clock, Loader2 } from 'lucide-react';
 
 export default function PaymentPlanPage({ userProfile }: { userProfile: UserProfile | null }) {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [settings, setSettings] = useState<GlobalSettings | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -36,8 +38,8 @@ export default function PaymentPlanPage({ userProfile }: { userProfile: UserProf
       id: '1_DAY',
       name: 'DarkBlaiseX 1 DAY',
       price: settings?.vip1DayPrice || 50,
-      duration: '1 Day',
-      features: ['Full System Access', '24/7 Support', 'Instant Activation'],
+      duration: t('1_day', { defaultValue: '1 Day' }),
+      features: [t('full_access', { defaultValue: 'Full System Access' }), t('support_247', { defaultValue: '24/7 Support' }), t('instant_activation', { defaultValue: 'Instant Activation' })],
       icon: Clock,
       color: 'border-cyan-500/30',
       glow: 'shadow-cyan-500/10'
@@ -46,8 +48,8 @@ export default function PaymentPlanPage({ userProfile }: { userProfile: UserProf
       id: '30_DAY',
       name: 'DarkBlaiseX 30 DAY',
       price: settings?.vip30DayPrice || 300,
-      duration: '30 Days',
-      features: ['Full System Access', 'Priority Support', 'Instant Activation', 'Exclusive Tools'],
+      duration: t('30_days', { defaultValue: '30 Days' }),
+      features: [t('full_access', { defaultValue: 'Full System Access' }), t('priority_support', { defaultValue: 'Priority Support' }), t('instant_activation', { defaultValue: 'Instant Activation' }), t('exclusive_tools', { defaultValue: 'Exclusive Tools' })],
       icon: Zap,
       color: 'border-cyan-500/60',
       glow: 'shadow-cyan-500/20'
@@ -69,8 +71,8 @@ export default function PaymentPlanPage({ userProfile }: { userProfile: UserProf
   return (
     <div className="min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center p-4">
       <div className="text-center mb-12">
-        <h2 className="text-4xl font-black text-white tracking-tighter italic mb-4">VIP MEMBERSHIP</h2>
-        <p className="text-gray-400 uppercase tracking-[0.2em] font-bold text-sm">Choose your plan for full access</p>
+        <h2 className="text-4xl font-black text-white tracking-tighter italic mb-4">{t('vip_membership')}</h2>
+        <p className="text-gray-400 uppercase tracking-[0.2em] font-bold text-sm">{t('choose_plan')}</p>
       </div>
 
       <div className="grid md:grid-cols-2 gap-8 w-full max-w-4xl">
@@ -115,7 +117,7 @@ export default function PaymentPlanPage({ userProfile }: { userProfile: UserProf
               onClick={() => handleSubscribe(plan.id, plan.price)}
               className="w-full bg-cyan-500 hover:bg-cyan-400 text-black font-black uppercase tracking-widest py-4 rounded-xl transition-all shadow-lg shadow-cyan-500/20 flex items-center justify-center gap-2 group-hover:scale-[1.02]"
             >
-              Subscribe
+              {t('subscribe')}
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </button>
           </motion.div>

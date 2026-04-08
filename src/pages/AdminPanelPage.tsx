@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { db, auth } from '../firebase';
 import { collection, doc, onSnapshot, updateDoc, query, orderBy, limit, deleteDoc, setDoc, addDoc } from 'firebase/firestore';
 import { motion, AnimatePresence } from 'motion/react';
+import { useTranslation } from 'react-i18next';
 import { UserProfile, PaymentRecord, Message, GlobalSettings } from '../types';
 import { Users, CreditCard, MessageSquare, Settings, Shield, Check, X, Trash2, Save, Loader2, Search, Filter, ArrowRight, Clock, ShieldCheck, ShieldAlert, Send } from 'lucide-react';
 
@@ -57,6 +58,7 @@ function handleFirestoreError(error: unknown, operationType: OperationType, path
 }
 
 export default function AdminPanelPage() {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<'users' | 'payments' | 'messages' | 'settings'>('users');
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [payments, setPayments] = useState<PaymentRecord[]>([]);
@@ -168,14 +170,14 @@ export default function AdminPanelPage() {
     if (!settings) return;
     try {
       await setDoc(doc(db, 'settings', 'global'), settings);
-      alert('Settings updated');
+      alert(t('settings_updated', { defaultValue: 'Settings updated' }));
     } catch (error) {
       handleFirestoreError(error, OperationType.WRITE, 'settings/global');
     }
   };
 
   const handleRejectPayment = async (paymentId: string) => {
-    if (!paymentId || !window.confirm('Are you sure you want to reject this payment request?')) return;
+    if (!paymentId || !window.confirm(t('confirm_reject_payment', { defaultValue: 'Are you sure you want to reject this payment request?' }))) return;
     try {
       await deleteDoc(doc(db, 'payments', paymentId));
     } catch (error) {
@@ -194,14 +196,14 @@ export default function AdminPanelPage() {
         <div className="w-full md:w-64 space-y-2">
           <h2 className="text-2xl font-black text-white tracking-tighter italic mb-8 flex items-center gap-3">
             <Shield className="w-8 h-8 text-cyan-400" />
-            ADMIN PANEL
+            {t('admin_panel')}
           </h2>
           
           {[
-            { id: 'users', name: 'Users', icon: Users },
-            { id: 'payments', name: 'VIP Approvals', icon: ShieldCheck },
-            { id: 'messages', name: 'Messages', icon: MessageSquare },
-            { id: 'settings', name: 'Settings', icon: Settings },
+            { id: 'users', name: t('users', { defaultValue: 'Users' }), icon: Users },
+            { id: 'payments', name: t('vip_approvals', { defaultValue: 'VIP Approvals' }), icon: ShieldCheck },
+            { id: 'messages', name: t('messages'), icon: MessageSquare },
+            { id: 'settings', name: t('settings'), icon: Settings },
           ].map((tab) => {
             const pendingCount = tab.id === 'payments' ? payments.filter(p => p.status === 'pending').length : 0;
             return (
@@ -235,12 +237,12 @@ export default function AdminPanelPage() {
             {activeTab === 'users' && (
               <motion.div key="users" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
                 <div className="flex items-center justify-between mb-8">
-                  <h3 className="text-xl font-black text-white tracking-tight uppercase italic">Manage Users</h3>
+                  <h3 className="text-xl font-black text-white tracking-tight uppercase italic">{t('manage_users', { defaultValue: 'Manage Users' })}</h3>
                   <div className="relative w-64">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
                     <input
                       type="text"
-                      placeholder="Search users..."
+                      placeholder={t('search_users', { defaultValue: 'Search users...' })}
                       value={search}
                       onChange={(e) => setSearch(e.target.value)}
                       className="w-full bg-black/50 border border-zinc-800 rounded-xl py-2 pl-10 pr-4 text-xs text-white focus:outline-none focus:border-cyan-500"
@@ -252,11 +254,11 @@ export default function AdminPanelPage() {
                   <table className="w-full text-left border-collapse">
                     <thead>
                       <tr className="border-b border-zinc-800 text-[10px] font-black uppercase tracking-widest text-gray-500">
-                        <th className="pb-4 pl-4">User</th>
-                        <th className="pb-4">Role</th>
-                        <th className="pb-4">Status</th>
-                        <th className="pb-4">Expiry</th>
-                        <th className="pb-4 pr-4 text-right">Actions</th>
+                        <th className="pb-4 pl-4">{t('user', { defaultValue: 'User' })}</th>
+                        <th className="pb-4">{t('role', { defaultValue: 'Role' })}</th>
+                        <th className="pb-4">{t('status', { defaultValue: 'Status' })}</th>
+                        <th className="pb-4">{t('expiry', { defaultValue: 'Expiry' })}</th>
+                        <th className="pb-4 pr-4 text-right">{t('actions', { defaultValue: 'Actions' })}</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-zinc-800/50">
@@ -320,12 +322,12 @@ export default function AdminPanelPage() {
 
             {activeTab === 'payments' && (
               <motion.div key="payments" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-                <h3 className="text-xl font-black text-white tracking-tight uppercase italic mb-8">VIP Approval Requests</h3>
+                <h3 className="text-xl font-black text-white tracking-tight uppercase italic mb-8">{t('vip_approval_requests', { defaultValue: 'VIP Approval Requests' })}</h3>
                 <div className="space-y-4">
                   {payments.length === 0 ? (
                     <div className="text-center py-20 opacity-20">
                       <ShieldCheck className="w-16 h-16 mx-auto mb-4" />
-                      <p className="font-black uppercase tracking-widest">No pending requests</p>
+                      <p className="font-black uppercase tracking-widest">{t('no_pending_requests', { defaultValue: 'No pending requests' })}</p>
                     </div>
                   ) : (
                     payments.map((p) => {
@@ -364,7 +366,7 @@ export default function AdminPanelPage() {
                                 onClick={() => handleApprovePayment(p)}
                                 className="px-6 py-2 rounded-xl bg-green-500 hover:bg-green-400 text-black font-black uppercase tracking-widest text-xs transition-all shadow-lg shadow-green-500/20"
                               >
-                                Approve VIP
+                                {t('approve_vip', { defaultValue: 'Approve VIP' })}
                               </button>
                               <button 
                                 onClick={() => handleRejectPayment(p.id!)}
@@ -384,15 +386,15 @@ export default function AdminPanelPage() {
 
             {activeTab === 'settings' && settings && (
               <motion.div key="settings" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-                <h3 className="text-xl font-black text-white tracking-tight uppercase italic mb-8">Global Settings</h3>
+                <h3 className="text-xl font-black text-white tracking-tight uppercase italic mb-8">{t('global_settings', { defaultValue: 'Global Settings' })}</h3>
                 <form onSubmit={handleUpdateSettings} className="space-y-8 max-w-2xl">
                   <div className="grid md:grid-cols-2 gap-6">
                     <div className="space-y-4">
-                      <h4 className="text-xs font-black uppercase tracking-[0.2em] text-cyan-500/60">Crypto Addresses</h4>
+                      <h4 className="text-xs font-black uppercase tracking-[0.2em] text-cyan-500/60">{t('crypto_addresses', { defaultValue: 'Crypto Addresses' })}</h4>
                       <div className="space-y-4">
                         {['btc', 'eth', 'ltc', 'usdt'].map((c) => (
                           <div key={c} className="space-y-1">
-                            <label className="text-[10px] font-black uppercase tracking-widest text-gray-500 ml-1">{c} Address</label>
+                            <label className="text-[10px] font-black uppercase tracking-widest text-gray-500 ml-1 uppercase">{c} {t('address', { defaultValue: 'Address' })}</label>
                             <input
                               type="text"
                               value={(settings as any)[`${c}Address`]}
@@ -404,10 +406,10 @@ export default function AdminPanelPage() {
                       </div>
                     </div>
                     <div className="space-y-4">
-                      <h4 className="text-xs font-black uppercase tracking-[0.2em] text-cyan-500/60">Pricing (USD)</h4>
+                      <h4 className="text-xs font-black uppercase tracking-[0.2em] text-cyan-500/60">{t('pricing_usd', { defaultValue: 'Pricing (USD)' })}</h4>
                       <div className="space-y-4">
                         <div className="space-y-1">
-                          <label className="text-[10px] font-black uppercase tracking-widest text-gray-500 ml-1">1 Day Price</label>
+                          <label className="text-[10px] font-black uppercase tracking-widest text-gray-500 ml-1">{t('1_day_price', { defaultValue: '1 Day Price' })}</label>
                           <input
                             type="number"
                             value={settings.vip1DayPrice}
@@ -416,7 +418,7 @@ export default function AdminPanelPage() {
                           />
                         </div>
                         <div className="space-y-1">
-                          <label className="text-[10px] font-black uppercase tracking-widest text-gray-500 ml-1">30 Day Price</label>
+                          <label className="text-[10px] font-black uppercase tracking-widest text-gray-500 ml-1">{t('30_day_price', { defaultValue: '30 Day Price' })}</label>
                           <input
                             type="number"
                             value={settings.vip30DayPrice}
@@ -432,7 +434,7 @@ export default function AdminPanelPage() {
                     className="w-full bg-cyan-500 hover:bg-cyan-400 text-black font-black uppercase tracking-widest py-4 rounded-xl transition-all shadow-xl shadow-cyan-500/20 flex items-center justify-center gap-3"
                   >
                     <Save className="w-6 h-6" />
-                    Save Settings
+                    {t('save_settings', { defaultValue: 'Save Settings' })}
                   </button>
                 </form>
               </motion.div>
@@ -440,14 +442,14 @@ export default function AdminPanelPage() {
 
             {activeTab === 'messages' && (
               <motion.div key="messages" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="h-full flex flex-col">
-                <h3 className="text-xl font-black text-white tracking-tight uppercase italic mb-8">User Messages</h3>
+                <h3 className="text-xl font-black text-white tracking-tight uppercase italic mb-8">{t('user_messages', { defaultValue: 'User Messages' })}</h3>
                 
                 <div className="flex flex-col md:flex-row gap-6 h-[60vh]">
                   {/* User List */}
                   <div className="w-full md:w-1/3 overflow-y-auto border-r border-zinc-800 pr-4 space-y-2">
-                    <h4 className="text-[10px] font-black uppercase tracking-widest text-gray-500 mb-4">Conversations</h4>
+                    <h4 className="text-[10px] font-black uppercase tracking-widest text-gray-500 mb-4">{t('conversations', { defaultValue: 'Conversations' })}</h4>
                     {uniqueMessageUsers.length === 0 ? (
-                      <p className="text-xs text-gray-600 italic">No messages yet</p>
+                      <p className="text-xs text-gray-600 italic">{t('no_messages_yet', { defaultValue: 'No messages yet' })}</p>
                     ) : (
                       uniqueMessageUsers.map(uid => {
                         const user = users.find(u => u.uid === uid);
@@ -477,7 +479,7 @@ export default function AdminPanelPage() {
                       <>
                         <div className="p-4 border-b border-zinc-800 bg-black/40 flex items-center justify-between">
                           <div className="text-sm font-black uppercase tracking-widest text-cyan-400">
-                            Chatting with {users.find(u => u.uid === selectedUserForChat)?.displayName || 'User'}
+                            {t('chatting_with', { defaultValue: 'Chatting with' })} {users.find(u => u.uid === selectedUserForChat)?.displayName || 'User'}
                           </div>
                           <button onClick={() => setSelectedUserForChat(null)} className="text-gray-500 hover:text-white">
                             <X className="w-4 h-4" />
@@ -508,7 +510,7 @@ export default function AdminPanelPage() {
                         <form onSubmit={handleSendReply} className="p-4 border-t border-zinc-800 bg-black/40 flex gap-2">
                           <input
                             type="text"
-                            placeholder="Type a reply..."
+                            placeholder={t('type_reply', { defaultValue: 'Type a reply...' })}
                             value={replyText}
                             onChange={(e) => setReplyText(e.target.value)}
                             className="flex-grow bg-black/50 border border-zinc-800 rounded-xl py-2 px-4 text-xs text-white focus:outline-none focus:border-cyan-500"
@@ -525,7 +527,7 @@ export default function AdminPanelPage() {
                     ) : (
                       <div className="flex-grow flex flex-col items-center justify-center text-center opacity-20">
                         <MessageSquare className="w-12 h-12 mb-2" />
-                        <p className="text-xs font-black uppercase tracking-widest">Select a conversation</p>
+                        <p className="text-xs font-black uppercase tracking-widest">{t('select_conversation', { defaultValue: 'Select a conversation' })}</p>
                       </div>
                     )}
                   </div>
