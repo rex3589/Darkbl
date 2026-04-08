@@ -7,7 +7,6 @@ import { UserProfile, UserRole } from './types';
 import { LogOut, User as UserIcon, Shield, MessageSquare, CreditCard, Home as HomeIcon, Loader2, Languages } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useTranslation } from 'react-i18next';
-import './i18n';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
